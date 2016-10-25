@@ -7,6 +7,7 @@ CFLAGS += -Wextra # Enable additional warnings
 CFLAGS += -O2 -D_FORTIFY_SOURCE=2 # Add canary code, i.e. detect buffer overflows
 CFLAGS += -fstack-protector-all # Add canary code to detect stack smashing
 CFLAGS += -D_POSIX_C_SOURCE=201112L -D_XOPEN_SOURCE # feature_test_macros for getpot and getaddrinfo
+CFLAGS += -g
 
 # We have no libraries to link against except libc, but we want to keep
 # the symbols for debugging
