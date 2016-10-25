@@ -38,6 +38,7 @@ void create_ack(pkt_t *ack,pkt_t *received){
 		pkt_set_type(ack,PTYPE_ACK);
 		pkt_set_seqnum(ack,(pkt_get_seqnum(received)%256)+1);
 		pkt_set_timestamp(ack,pkt_get_timestamp(received));
+		pkt_set_payload(ack,NULL,0);
 	}
 
 //function tu send data from sender to receiver
@@ -230,7 +231,6 @@ void write_loop(const int socket, const int in){
 
 
 	}
-	pkt_del(last);
 	
 
 
@@ -292,11 +292,11 @@ void read_loop(const int socket, const int out){
 			if (status != 0) {
 				fprintf(stderr, "Error decode : %d, address : %d\n",status, received == NULL);
 				
-				if(status == E_CRC){
+				
 					lengthR = 1;
 					pkt_del(received);
 					received = NULL;
-				}
+				
 			}
 			if(received != NULL && expected%256 == pkt_get_seqnum(received)){
 				pkt_t *last = received;
