@@ -215,6 +215,7 @@ void write_loop(const int socket, const int in){
 				if(window[j] != NULL && time(NULL)-pkt_get_timestamp(window[j]) > 1 /*&& ackWindow >= sentPacket*/){
 
 					pkt_set_timestamp(window[j],(uint32_t)time(NULL));
+					bufSize = 524;
 					status = pkt_encode(window[j], buf, &bufSize); //encode the pkt to be sent
 
 					if(status != 0){
