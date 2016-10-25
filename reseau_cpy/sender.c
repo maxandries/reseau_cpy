@@ -66,6 +66,7 @@ int main(int argc,char *const *argv){
 	//read on stdin
 	else{
 		write_loop(s, fileno(stdin));
+		free(IPaddress);
 		return 0;
 	}
 }

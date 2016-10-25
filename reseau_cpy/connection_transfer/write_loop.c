@@ -77,6 +77,7 @@ void write_loop(const int socket, const int in){
 	else{
 		desc = in+1;
 	}
+	pkt_t *last = NULL;
 
 	while((a != 0 || i != 31) && lastIsReceived !=1){
 		FD_ZERO(&read_fds);
@@ -96,7 +97,7 @@ void write_loop(const int socket, const int in){
 				fprintf(stderr, "error: %s\n", strerror(errno));
 			}
 			if(a == 0 && i==31 && encodeLast == 0){
-				pkt_t *last = pkt_new();
+				last = pkt_new();
 				pkt_set_type(last, PTYPE_DATA);
 				pkt_set_window(last,0);
 				pkt_set_seqnum(last,seqnum%256);
@@ -228,6 +229,7 @@ void write_loop(const int socket, const int in){
 
 
 	}
+	pkt_del(last);
 
 
 
