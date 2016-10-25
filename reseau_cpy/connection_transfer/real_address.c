@@ -22,6 +22,6 @@ const char *real_address(const char *address, struct sockaddr_in6 *rval){
 	}
 	//rval = (struct sockaddr_in6 *) res->ai_addr;
 	memcpy((void *)rval,(void *)res->ai_addr, sizeof(struct sockaddr_in6));
-	
+	free(res);
 	return NULL;
 }

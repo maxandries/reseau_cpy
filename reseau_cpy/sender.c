@@ -32,12 +32,12 @@ int main(int argc,char *const *argv){
 			break;
 		default:
 			if(address == NULL){
-				
+
 				address = argv[i];
 			}
 			else{
 				port = atoi(argv[i]);
-				
+
 			}
 			break;
 		}
@@ -51,6 +51,8 @@ int main(int argc,char *const *argv){
 	}
 
 	int s = create_socket(NULL, 0, IPaddress, port);
+	free(IPaddress);
+	
 	if(s == -1){
 		return -1;
 	}
