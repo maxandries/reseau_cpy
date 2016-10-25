@@ -367,7 +367,7 @@ void read_loop(const int socket, const int out){
 			pkt_encode((const pkt_t *)ack,buf2,&siZe);
 			a = write(socket,buf2,12);
 			boolack = 0;
-			pkt_del(ack);
+			//pkt_del(ack);
 
 		}
 

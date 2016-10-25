@@ -28,7 +28,9 @@ pkt_t* pkt_new()
 
 void pkt_del(pkt_t *pkt)
 {
-	free(pkt->payload);
+	if(pkt->payload != NULL){
+		free(pkt->payload);
+	}
 	free(pkt);
 }
 
@@ -115,8 +117,10 @@ pkt_status_code pkt_encode(const pkt_t* pkt, char *buf, size_t *len)
 		uint32_t timestamp = (pkt_get_timestamp(pkt));
 		memcpy((void *)buf+4,(void *) &timestamp, 4);
 		*len+=4;
-		memcpy((void *)buf+8,(void *) pkt->payload, pkt_get_length(pkt));
-		*len+=pkt_get_length(pkt);
+		if(pkt_get_payload(pkt) != NULL){
+			memcpy((void *)buf+8,(void *) pkt->payload, pkt_get_length(pkt));
+			*len+=pkt_get_length(pkt);
+		}
 		uint32_t crc =htonl((uint32_t)crc32(0,(const Bytef *)buf,8+pkt_get_length(pkt)));
 		memcpy(buf+8+(pkt->length), &crc, sizeof(uint32_t));
         *len+=4;
