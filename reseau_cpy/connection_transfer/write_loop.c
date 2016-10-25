@@ -19,14 +19,14 @@ void delWindow(pkt_t *buffer[], uint8_t seq, int *j, int *sentPackets){
 
 			if(pkt_get_seqnum(buffer[i]) <= seq && (seq - pkt_get_seqnum(buffer[i]))<= MAX_WINDOW_SIZE){
 				printf("delete seqnum%d\n", pkt_get_seqnum(buffer[i]));
-				pkt_del(buffer[i]);
+				pkt_del(*(buffer+i));
 				buffer[i] = NULL;
 				(*j)++;
 				(*sentPackets)--;
 			}
 			else if(pkt_get_seqnum(buffer[i]) > seq && (seq+255)-pkt_get_seqnum(buffer[i]) <= MAX_WINDOW_SIZE){
 				printf("delete seqnum%d\n", pkt_get_seqnum(buffer[i]));
-				pkt_del(buffer[i]);
+				pkt_del(*(buffer+i));
 				buffer[i] = NULL;
 				(*j)++;
 				(*sentPackets)--;
@@ -132,7 +132,7 @@ void write_loop(const int socket, const int in){
 						}
 				}
 			}
-			else{
+			else if(a>0){
 
 				pkt_t *send = pkt_new(); //creation of a structure to send (it needs to be encoded)
 				pkt_set_payload(send, temp, a);
@@ -230,8 +230,7 @@ void write_loop(const int socket, const int in){
 
 	}
 	pkt_del(last);
-
-
+	
 
 
 }
@@ -260,6 +259,7 @@ void read_loop(const int socket, const int out){
 	pkt_status_code status;
 
 	pkt_t *received = NULL;
+	pkt_t *ack = NULL;
 
 	int desc = 0;
 	if(socket > out){
@@ -279,7 +279,7 @@ void read_loop(const int socket, const int out){
 		if(select(desc, &read_fds, &write_fds, NULL, 0)==-1){
 			fprintf(stderr, "error: %s\n", strerror(errno));
 		}
-		pkt_t *ack = pkt_new();
+		
 		if(FD_ISSET(socket, &read_fds) && FD_ISSET(out,&write_fds) && i != 31){
 			a = read(socket, (void *)buf,bufSize);
 				printf("a = %d\n", a);
@@ -299,6 +299,7 @@ void read_loop(const int socket, const int out){
 			}
 			if(received != NULL && expected%256 == pkt_get_seqnum(received)){
 				pkt_t *last = received;
+				uint16_t lengthReceived = pkt_get_length(received);
 				a = write(out,pkt_get_payload(received), pkt_get_length(received));
 				if(a<0){
 					fprintf(stderr,"Error : %s",strerror(errno));
@@ -331,10 +332,11 @@ void read_loop(const int socket, const int out){
 					}
 				}
 				//expected = expectedSeq;
-				if(a < pkt_get_length(received)){
+				if(a < lengthReceived){
 					fprintf(stderr,"Error : %s\n",strerror(errno));
 				}else{
 					printf("do we pass here?\n");
+					ack = pkt_new();
 					create_ack(ack,last);
 					pkt_del(last);
 					boolack = 1;

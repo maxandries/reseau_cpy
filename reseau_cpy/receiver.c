@@ -61,12 +61,14 @@ int main(int argc, char *argv[]){
       return -1;
     }
       read_loop(socket, fileNbr);
+      free(sender);
       return 0;
   }
   //read on stdin
   else{
 
     read_loop(socket, fileno(stdout));
+    free(sender);
     return 0;
   }
 }
