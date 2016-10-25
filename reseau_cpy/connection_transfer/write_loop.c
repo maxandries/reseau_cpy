@@ -63,7 +63,7 @@ void write_loop(const int socket, const int in){
 	int lastIsSend = 0;
 	int encodeLast = 0;
 
-	uint8_t seqnumLast;
+	uint8_t seqnumLast = 0;
 
 	size_t bufSize = 524; //max size of the buffer to encode/decode 12(struct)+512ll (MAX_PAYLOAD_SIZE)
 
@@ -79,7 +79,7 @@ void write_loop(const int socket, const int in){
 	}
 	pkt_t *last = NULL;
 
-	while((a != 0 || i != 31) && lastIsReceived !=1){
+	while(lastIsReceived !=1){
 		FD_ZERO(&read_fds);
 		FD_SET(in, &read_fds);//we can read from the input file/stdin or from the socket
 		FD_SET(socket, &read_fds);
@@ -183,8 +183,9 @@ void write_loop(const int socket, const int in){
 				if(pkt_get_seqnum(received) == seqnumLast){
 					printf("lastReceived\n");
 					lastIsReceived = 1;
+					delWindow(window, pkt_get_seqnum(received)-1, &i, &sentPacket);
 				}
-				delWindow(window, pkt_get_seqnum(received)-1, &i, &sentPacket);
+				
 				pkt_del(received);
 
 			}
