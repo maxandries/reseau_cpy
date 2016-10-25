@@ -105,7 +105,7 @@ void write_loop(const int socket, const int in){
 				pkt_set_timestamp(last,(uint32_t)time(NULL));
 				pkt_set_length(last,0);
 				status = pkt_encode(last, buf, &bufSize);
-				printf("encode last\n");
+				printf("encode last, seqnum : %d\n",seqnum%256);
 				window[0] = last;
 				lastIsSend = 1;
 				encodeLast = 1;
@@ -290,11 +290,11 @@ void read_loop(const int socket, const int out){
 			status = pkt_decode(buf,a,received);
 			if (status != 0) {
 				fprintf(stderr, "Error decode : %d, address : %d\n",status, received == NULL);
-
+				
 				if(status == E_CRC){
-						lengthR = 1;
-						pkt_del(received);
-						received = NULL;
+					lengthR = 1;
+					pkt_del(received);
+					received = NULL;
 				}
 			}
 			if(received != NULL && expected%256 == pkt_get_seqnum(received)){
@@ -340,6 +340,9 @@ void read_loop(const int socket, const int out){
 						pkt_del(ack);
 					}
 					ack = pkt_new();
+					if(last != received){
+						pkt_del(received);
+					}
 					create_ack(ack,last);
 					pkt_del(last);
 					boolack = 1;
@@ -360,6 +363,9 @@ void read_loop(const int socket, const int out){
 					}
 				}
 			}
+			else if(received != NULL && expected%256 > pkt_get_seqnum(received)){
+				pkt_del(received);
+			}
 		}
 
 		if(FD_ISSET(socket, &write_fds) && boolack == 1){
@@ -370,8 +376,17 @@ void read_loop(const int socket, const int out){
 			pkt_encode((const pkt_t *)ack,buf2,&siZe);
 			a = write(socket,buf2,12);
 			boolack = 0;
-			//pkt_del(ack);
-
+			if(lengthR == 0){
+				int boolLast = 0;
+				for(int b = 0; b < 31 && boolLast == 0;b++){
+					if(window[b] != NULL){
+						pkt_del(window[b]);
+						boolLast = 1;
+					}
+				}
+				pkt_del(ack);
+			}
+			
 		}
 
 	}
