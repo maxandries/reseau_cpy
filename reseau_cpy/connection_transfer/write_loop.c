@@ -336,6 +336,9 @@ void read_loop(const int socket, const int out){
 					fprintf(stderr,"Error : %s\n",strerror(errno));
 				}else{
 					printf("do we pass here?\n");
+					if(ack != NULL){
+						pkt_del(ack);
+					}
 					ack = pkt_new();
 					create_ack(ack,last);
 					pkt_del(last);
