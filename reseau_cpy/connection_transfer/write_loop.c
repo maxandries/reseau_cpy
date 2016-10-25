@@ -87,7 +87,6 @@ void write_loop(const int socket, const int in){
 
 		bufSize = 524; //reset the value at each loop;
 		if(select(desc, &read_fds, &write_fds, NULL, 0)==-1){
-
 			fprintf(stderr, "error: %s\n", strerror(errno));
 		}
 
@@ -185,6 +184,7 @@ void write_loop(const int socket, const int in){
 					lastIsReceived = 1;
 				}
 				delWindow(window, pkt_get_seqnum(received)-1, &i, &sentPacket);
+				pkt_del(received);
 
 			}
 			else{
@@ -202,6 +202,7 @@ void write_loop(const int socket, const int in){
 				printf("ack recu : window %d seqnum : %d\n",ackWindow,pkt_get_seqnum(received));
 
 				delWindow(window, pkt_get_seqnum(received)-1, &i, &sentPacket);
+				pkt_del(received);
 			}
 
 		}

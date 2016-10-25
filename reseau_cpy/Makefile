@@ -10,7 +10,7 @@ CFLAGS += -D_POSIX_C_SOURCE=201112L -D_XOPEN_SOURCE # feature_test_macros for ge
 
 # We have no libraries to link against except libc, but we want to keep
 # the symbols for debugging
-LDFLAGS= -rdynamic
+#LDFLAGS= -rdynamic
 LDFLAGS+= -lz
 
 # Default target
@@ -22,10 +22,10 @@ debug: CFLAGS += -g -DDEBUG -Wno-unused-parameter -fno-omit-frame-pointer
 debug: clean chat
 
 # We use an implicit rule to build an executable named 'chat'
-sender: sender.o connection_transfer/write_loop.o connection_transfer/create_socket.o connection_transfer/real_address.o connection_transfer/wait_for_client.o connection_transfer/write_loop.o packet/packet_implem.o
+sender: sender.o connection_transfer/write_loop.o connection_transfer/create_socket.o connection_transfer/real_address.o connection_transfer/wait_for_client.o connection_transfer/write_loop.o packet/packet_implem.o $(LDFLAGS)
 
-receiver: receiver.o connection_transfer/write_loop.o connection_transfer/create_socket.o connection_transfer/real_address.o connection_transfer/wait_for_client.o connection_transfer/write_loop.o packet/packet_implem.o
+receiver: receiver.o connection_transfer/write_loop.o connection_transfer/create_socket.o connection_transfer/real_address.o connection_transfer/wait_for_client.o connection_transfer/write_loop.o packet/packet_implem.o $(LDFLAGS)
 .PHONY: clean
 
 clean:
-	@rm -f receiver.o sender.o sender receiver connection_transfer/write_loop.o connection_transfer/create_socket.o connection_transfer/real_address.o connection_transfer/wait_for_client.o connection_transfer/write_loop.o packet/packet_implem.o 
+	@rm -f receiver.o sender.o sender receiver connection_transfer/write_loop.o connection_transfer/create_socket.o connection_transfer/real_address.o connection_transfer/wait_for_client.o connection_transfer/write_loop.o packet/packet_implem.o
